@@ -1,0 +1,11 @@
+# Secret password file (Crucial!)
+config.properties
+
+# IntelliJ temporary folders
+.idea/
+*.iml
+out/
+gen/
+
+# Compiled Java files
+*.class
