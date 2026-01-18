@@ -1,7 +1,9 @@
 package taskmanager;
 
 public class Main {
-    public static void main(String[] args) {
+    void main() {
+        System.out.println("Student Task Manager started");
+    } {
         System.out.println("Student Task Manager started");
     }
 }
