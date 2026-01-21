@@ -8,7 +8,7 @@ import java.util.List;
 
 public class UserRepositoryImpl implements UserRepository {
     @Override
-    public void createUser(User user) {
+    public int createUser(User user) {
         String sql = "INSERT INTO users (name, email, role) VALUES (?, ?, ?)";
         try (Connection conn = DatabaseConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -19,6 +19,7 @@ public class UserRepositoryImpl implements UserRepository {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return 0;
     }
 
     @Override
