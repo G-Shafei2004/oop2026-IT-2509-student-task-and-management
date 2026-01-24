@@ -1,4 +1,4 @@
-package taskmanager;
+package taskmanager.controllers;
 
 import taskmanager.entities.*;
 import taskmanager.repositories.*;
