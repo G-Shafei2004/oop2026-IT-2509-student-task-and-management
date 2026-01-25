@@ -18,7 +18,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
 
         try {
-            System.out.println("--- ✅ Starting Interactive Input ---");
+            System.out.println(" Starting Interactive Input ");
 
 
 
@@ -44,7 +44,7 @@ public class Main {
             userService.createUser(user);
             List<User> users = userService.getAllUsers();
             int userId = users.get(users.size() - 1).getId();
-            System.out.println("✅ User created with ID: " + userId);
+            System.out.println(" User created with ID: " + userId);
 
 
 
@@ -64,7 +64,7 @@ public class Main {
             projectService.createProject(project);
             List<Project> projects = projectService.getAllProjects();
             int projectId = projects.get(projects.size() - 1).getId();
-            System.out.println("✅ Project created with ID: " + projectId);
+            System.out.println(" Project created with ID: " + projectId);
 
 
 
@@ -87,7 +87,7 @@ public class Main {
                 try {
                     deadline = LocalDate.parse(deadlineInput);
                 } catch (Exception e) {
-                    System.out.println("❌ Invalid date format. Try again.");
+                    System.out.println(" Invalid date format. Try again.");
                 }
             }
 
@@ -95,7 +95,7 @@ public class Main {
             taskService.createTask(task);
             List<Task> tasks = taskService.getAllTasks();
             int taskId = tasks.get(tasks.size() - 1).getId();
-            System.out.println("✅ Task created with ID: " + taskId);
+            System.out.println(" Task created with ID: " + taskId);
 
 
 
@@ -107,10 +107,10 @@ public class Main {
 
             Comment comment = new Comment(0, commentText, taskId, userId, LocalDateTime.now());
             commentService.addComment(comment);
-            System.out.println("✅ Comment added successfully");
+            System.out.println(" Comment added successfully");
 
         } catch (Exception e) {
-            System.err.println("❌ Error: " + e.getMessage());
+            System.err.println(" Error: " + e.getMessage());
         }
     }
 }
