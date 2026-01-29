@@ -13,15 +13,18 @@ public class Project {
         this.ownerId = ownerId;
     }
 
-    // ✅ Getters
+
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getDescription() { return description; }
     public int getOwnerId() { return ownerId; }
 
-    // ✅ Setters (optional)
+
     public void setId(int id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
-    public void setDescription(String description) { this.description = description; }
+    public void setDescription(String description) {
+        if (description != null && description.length() > 500) {
+            throw new IllegalArgumentException("Description is too long (max 500 chars)");
+        }this.description = description; }
     public void setOwnerId(int ownerId) { this.ownerId = ownerId; }
 }

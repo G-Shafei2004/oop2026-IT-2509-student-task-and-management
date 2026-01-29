@@ -90,6 +90,7 @@ public class Main {
 
             Task task = new Task(0, taskTitle, taskStatus, deadline, projectId, userId);
             taskService.createTask(task);
+            System.out.println("Days remaining for this task: " + task.getDaysUntilDeadline());
             List<Task> tasks = taskService.getAllTasks();
             int taskId = tasks.get(tasks.size() - 1).getId();
             System.out.println(" Task created with ID: " + taskId);

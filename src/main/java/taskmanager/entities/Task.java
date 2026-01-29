@@ -1,6 +1,7 @@
 package taskmanager.entities;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class Task {
     private int id;
@@ -19,7 +20,7 @@ public class Task {
         this.assignedUserId = assignedUserId;
     }
 
-    // ✅ Add these getters
+
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getStatus() { return status; }
@@ -27,11 +28,17 @@ public class Task {
     public int getProjectId() { return projectId; }
     public int getAssignedUserId() { return assignedUserId; }
 
-    // Optional setters if needed
+
     public void setId(int id) { this.id = id; }
     public void setTitle(String title) { this.title = title; }
     public void setStatus(String status) { this.status = status; }
     public void setDeadline(LocalDate deadline) { this.deadline = deadline; }
     public void setProjectId(int projectId) { this.projectId = projectId; }
     public void setAssignedUserId(int assignedUserId) { this.assignedUserId = assignedUserId; }
+    public long getDaysUntilDeadline() {
+        if (this.deadline == null) {
+            return 0;
+        }
+        return ChronoUnit.DAYS.between(LocalDate.now(), this.deadline);
+    }
 }
