@@ -23,5 +23,9 @@ public class User {
     public void setId(int id) { this.id = id; }
     public void setName(String name) { this.name = name; }
     public void setEmail(String email) { this.email = email; }
-    public void setRole(String role) { this.role = role; }
+    public void setRole(String role) {
+        if (role == null || role.isEmpty()) {
+            throw new IllegalArgumentException("Role cannot be empty");
+        }
+        this.role = role; }
 }
