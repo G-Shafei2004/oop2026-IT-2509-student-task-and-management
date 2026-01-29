@@ -19,9 +19,6 @@ public class Main {
 
         try {
             System.out.println(" Starting Interactive Input ");
-
-
-
             String name;
             do {
                 System.out.print("Enter user name: ");
