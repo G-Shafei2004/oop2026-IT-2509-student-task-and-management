@@ -1,6 +1,7 @@
 package taskmanager.entities;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 
 public class Task {
     private int id;
@@ -34,4 +35,10 @@ public class Task {
     public void setDeadline(LocalDate deadline) { this.deadline = deadline; }
     public void setProjectId(int projectId) { this.projectId = projectId; }
     public void setAssignedUserId(int assignedUserId) { this.assignedUserId = assignedUserId; }
+    public long getDaysUntilDeadline() {
+        if (this.deadline == null) {
+            return 0;
+        }
+        return ChronoUnit.DAYS.between(LocalDate.now(), this.deadline);
+    }
 }
