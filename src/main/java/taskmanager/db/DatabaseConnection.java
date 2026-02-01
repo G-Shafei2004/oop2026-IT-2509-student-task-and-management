@@ -9,6 +9,12 @@ import java.io.InputStream;
 import java.util.Properties;
 
 public class DatabaseConnection {
+    // 1. New field: This variable holds the ONLY instance of this class
+    private static DatabaseConnection instance;
+
+    // 2. New field: This variable holds the actual connection to the DB
+    private Connection connection;
+
     private static final String URL =
             "jdbc:postgresql://aws-1-ap-southeast-2.pooler.supabase.com:5432/postgres?sslmode=require";
     private static final String USER = "postgres.rclpzboctpicuiyizexo";
@@ -28,7 +34,27 @@ public class DatabaseConnection {
         }
     }
 
-    public static Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(URL, USER, PASSWORD);
+    // 3. New Private Constructor:
+    // It is "private" so no other class can do 'new DatabaseConnection()'
+    private DatabaseConnection() {
+        try {
+            this.connection = DriverManager.getConnection(URL, USER, PASSWORD);
+        } catch (SQLException e) {
+            throw new RuntimeException("Error connecting to the database", e);
+        }
+    }
+
+    // 4. New Static Method:
+    // This is the "Gatekeeper". It checks if an instance exists.
+    public static DatabaseConnection getInstance() {
+        if (instance == null) {
+            instance = new DatabaseConnection();
+        }
+        return instance;
+    }
+
+    // 5. Getter for the connection
+    public Connection getConnection() {
+        return connection;
     }
 }
