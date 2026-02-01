@@ -11,7 +11,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     @Override
     public void createComment(Comment comment) {
         String sql = "INSERT INTO comments (text, task_id, user_id, timestamp) VALUES (?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, comment.getText());
             stmt.setInt(2, comment.getTaskId());
@@ -27,7 +27,7 @@ public class CommentRepositoryImpl implements CommentRepository {
     public List<Comment> listCommentsByTaskId(int taskId) {
         List<Comment> comments = new ArrayList<>();
         String sql = "SELECT * FROM comments WHERE task_id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, taskId);
             ResultSet rs = stmt.executeQuery();
