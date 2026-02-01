@@ -11,7 +11,6 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public void save(Task task) {
         String sql = "INSERT INTO tasks (title, status, deadline, project_id, assigned_user_id) VALUES (?, ?, ?, ?, ?)";
-        // Reusing the same connection via Singleton
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, task.getTitle());
@@ -33,14 +32,14 @@ public class TaskRepositoryImpl implements TaskRepository {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                return new Task(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("status"),
-                        rs.getDate("deadline").toLocalDate(),
-                        rs.getInt("project_id"),
-                        rs.getInt("assigned_user_id")
-                );
+                // UPDATE: Using the Builder instead of 'new Task'
+                return new Task.TaskBuilder(rs.getString("title"))
+                        .setId(rs.getInt("id"))
+                        .setStatus(rs.getString("status"))
+                        .setDeadline(rs.getDate("deadline").toLocalDate())
+                        .setProjectId(rs.getInt("project_id"))
+                        .setAssignedUserId(rs.getInt("assigned_user_id"))
+                        .build();
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -56,14 +55,14 @@ public class TaskRepositoryImpl implements TaskRepository {
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                tasks.add(new Task(
-                        rs.getInt("id"),
-                        rs.getString("title"),
-                        rs.getString("status"),
-                        rs.getDate("deadline").toLocalDate(),
-                        rs.getInt("project_id"),
-                        rs.getInt("assigned_user_id")
-                ));
+                // UPDATE: Using the Builder instead of 'new Task'
+                tasks.add(new Task.TaskBuilder(rs.getString("title"))
+                        .setId(rs.getInt("id"))
+                        .setStatus(rs.getString("status"))
+                        .setDeadline(rs.getDate("deadline").toLocalDate())
+                        .setProjectId(rs.getInt("project_id"))
+                        .setAssignedUserId(rs.getInt("assigned_user_id"))
+                        .build());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -71,7 +70,6 @@ public class TaskRepositoryImpl implements TaskRepository {
         return tasks;
     }
 
-    // ADD THIS TO REMOVE THE ERROR
     @Override
     public void delete(int id) {
         String sql = "DELETE FROM tasks WHERE id = ?";
