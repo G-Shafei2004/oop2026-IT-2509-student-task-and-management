@@ -10,7 +10,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public void createProject(Project project) {
         String sql = "INSERT INTO projects (title, description, owner_id) VALUES (?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, project.getTitle());
             stmt.setString(2, project.getDescription());
@@ -24,7 +24,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public Project findProjectById(int id) {
         String sql = "SELECT * FROM projects WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -46,7 +46,7 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     public List<Project> listAllProjects() {
         List<Project> projects = new ArrayList<>();
         String sql = "SELECT * FROM projects";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
