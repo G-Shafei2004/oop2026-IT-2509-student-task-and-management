@@ -7,10 +7,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TaskRepositoryImpl implements TaskRepository {
+
     @Override
-    public void createTask(Task task) {
+    public void save(Task task) {
         String sql = "INSERT INTO tasks (title, status, deadline, project_id, assigned_user_id) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection();
+        // Reusing the same connection via Singleton
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, task.getTitle());
             stmt.setString(2, task.getStatus());
@@ -24,9 +26,9 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public Task findTaskById(int id) {
+    public Task findById(int id) {
         String sql = "SELECT * FROM tasks WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
@@ -47,10 +49,10 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
-    public List<Task> listAllTasks() {
+    public List<Task> findAll() {
         List<Task> tasks = new ArrayList<>();
         String sql = "SELECT * FROM tasks";
-        try (Connection conn = DatabaseConnection.getConnection();
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
@@ -67,5 +69,18 @@ public class TaskRepositoryImpl implements TaskRepository {
             e.printStackTrace();
         }
         return tasks;
+    }
+
+    // ADD THIS TO REMOVE THE ERROR
+    @Override
+    public void delete(int id) {
+        String sql = "DELETE FROM tasks WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
