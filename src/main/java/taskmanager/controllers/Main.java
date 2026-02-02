@@ -1,44 +1,74 @@
 package taskmanager.controllers;
 
 import taskmanager.entities.Task;
-import taskmanager.repositories.TaskRepository;
+import taskmanager.entities.User;
 import taskmanager.repositories.TaskRepositoryImpl;
+import taskmanager.repositories.UserRepositoryImpl;
 import taskmanager.services.TaskService;
+import taskmanager.services.UserService;
+
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Scanner;
 
 public class Main {
+
     public static void main(String[] args) {
-        // 1. Initialize Repository and Service
-        TaskRepository repository = new TaskRepositoryImpl();
-        TaskService taskService = new TaskService(repository);
 
-        System.out.println("--- Starting Milestone 2 Demo ---");
+        UserService userService = new UserService(new UserRepositoryImpl());
+        TaskService taskService = new TaskService(new TaskRepositoryImpl());
+        Scanner scanner = new Scanner(System.in);
 
-        // 2. DEMO: BUILDER PATTERN
-        // We create a task without a long, confusing constructor.
-        Task newTask = new Task.TaskBuilder("Study for Java Defense")
-                .setStatus("Pending")
-                .setDeadline(LocalDate.now().plusDays(5))
-                .setProjectId(1)
-                .setAssignedUserId(10)
-                .build();
+        try {
+            System.out.println("=== Task Manager System | Milestone 2 ===");
 
-        System.out.println("Created Task via Builder: " + newTask.getTitle());
+            // -------- USER INPUT --------
+            System.out.print("Enter user name: ");
+            String name = scanner.nextLine();
 
-        // 3. DEMO: FACTORY PATTERN (Inside addNewTask)
-        // When we call this, it saves to DB AND triggers the Notification Factory.
-        taskService.addNewTask(newTask);
+            System.out.print("Enter user email: ");
+            String email = scanner.nextLine();
 
-        // 4. DEMO: LAMBDAS & STREAMS
-        // We filter the list of all tasks to find only 'Pending' ones using a Lambda.
-        System.out.println("\n--- Filtering Tasks by Status (Lambda) ---");
-        List<Task> pendingTasks = taskService.getTasksByStatus("Pending");
+            System.out.print("Enter user role: ");
+            String role = scanner.nextLine();
 
-        pendingTasks.forEach(t ->
-                System.out.println("Pending Task found: " + t.getTitle())
-        );
+            userService.createUser(new User(0, name, email, role));
 
-        System.out.println("\n--- Milestone 2 Demo Completed Successfully ---");
+            // get last inserted user (demo purpose)
+            List<User> users = userService.getAllUsers();
+            int userId = users.get(users.size() - 1).getId();
+
+            // -------- TASK INPUT --------
+            System.out.print("Enter project ID: ");
+            int projectId = Integer.parseInt(scanner.nextLine());
+
+            System.out.print("Enter task title: ");
+            String taskTitle = scanner.nextLine();
+
+            // -------- BUILDER PATTERN --------
+            Task task = new Task.TaskBuilder(taskTitle)
+                    .setStatus("Pending")
+                    .setDeadline(LocalDate.now().plusDays(7))
+                    .setProjectId(projectId)
+                    .setAssignedUserId(userId)
+                    .build();
+
+            // -------- FACTORY (inside service) --------
+            taskService.addNewTask(task);
+
+            // -------- LAMBDA / STREAMS --------
+            System.out.println("\n--- Pending Tasks ---");
+            taskService.getTasksByStatus("Pending")
+                    .forEach(t ->
+                            System.out.println("User: " + name + " | Task: " + t.getTitle())
+                    );
+
+            System.out.println("\nData saved successfully!");
+
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        } finally {
+            scanner.close();
+        }
     }
 }
