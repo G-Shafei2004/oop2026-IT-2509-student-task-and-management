@@ -1,44 +1,39 @@
 package taskmanager.services;
-
+import taskmanager.services.notification.INotification;
 import taskmanager.entities.Task;
 import taskmanager.repositories.TaskRepository;
+import taskmanager.services.notification.INotification;
 import taskmanager.services.notification.NotificationFactory;
-import taskmanager.services.notification.Notification;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class TaskService {
-    private final TaskRepository taskRepo;
+    private final TaskRepository taskRepository;
 
-    public TaskService(TaskRepository taskRepo) {
-        this.taskRepo = taskRepo;
+    public TaskService(TaskRepository taskRepository) {
+        this.taskRepository = taskRepository;
     }
 
-    public void createTask(Task task) {
-        if (task.getDeadline().isBefore(java.time.LocalDate.now())) {
-            throw new RuntimeException("Deadline cannot be in the past!");
+    // This method triggers the Factory Pattern (New Scenario)
+    public void addNewTask(Task task) {
+        taskRepository.save(task);
+
+        // Factory Pattern in action
+        INotification notification = NotificationFactory.getNotification("EMAIL");
+        if (notification != null) {
+            notification.send("New task assigned: " + task.getTitle());
         }
-        taskRepo.save(task);
-
-        Notification messenger = NotificationFactory.getNotification("EMAIL");
-        if (messenger != null) {
-            messenger.send("Task '" + task.getTitle() + "' was successfully created!");
-        }
-    }
-
-    public List<Task> getTasksByStatus(String status) {
-        List<Task> allTasks = taskRepo.findAll();
-
-        return allTasks.stream()
-                .filter(t -> t.getStatus().equalsIgnoreCase(status))
-                .collect(Collectors.toList());
-    }
-
-    public Task getTaskById(int id) {
-        return taskRepo.findById(id);
     }
 
     public List<Task> getAllTasks() {
-        return taskRepo.findAll();
+        return taskRepository.findAll();
+    }
+
+    // This method satisfies the Lambdas & Streams requirement
+    public List<Task> getTasksByStatus(String status) {
+        return taskRepository.findAll().stream()
+                .filter(t -> t.getStatus().equalsIgnoreCase(status))
+                .collect(Collectors.toList());
     }
 }

@@ -11,8 +11,8 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public void save(Task task) {
         String sql = "INSERT INTO tasks (title, status, deadline, project_id, assigned_user_id) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, task.getTitle());
             stmt.setString(2, task.getStatus());
             stmt.setDate(3, java.sql.Date.valueOf(task.getDeadline()));
@@ -27,12 +27,11 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public Task findById(int id) {
         String sql = "SELECT * FROM tasks WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                // UPDATE: Using the Builder instead of 'new Task'
                 return new Task.TaskBuilder(rs.getString("title"))
                         .setId(rs.getInt("id"))
                         .setStatus(rs.getString("status"))
@@ -50,12 +49,10 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public List<Task> findAll() {
         List<Task> tasks = new ArrayList<>();
-        String sql = "SELECT * FROM tasks";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM tasks");
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                // UPDATE: Using the Builder instead of 'new Task'
                 tasks.add(new Task.TaskBuilder(rs.getString("title"))
                         .setId(rs.getInt("id"))
                         .setStatus(rs.getString("status"))
@@ -73,8 +70,8 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     public void delete(int id) {
         String sql = "DELETE FROM tasks WHERE id = ?";
-        try (Connection conn = DatabaseConnection.getInstance().getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        Connection conn = DatabaseConnection.getInstance().getConnection();
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, id);
             stmt.executeUpdate();
         } catch (SQLException e) {

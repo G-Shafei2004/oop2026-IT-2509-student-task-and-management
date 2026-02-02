@@ -1,5 +1,5 @@
 package taskmanager.services.notification;
 
-public interface Notification {
+public interface INotification {
     void send(String message);
 }

@@ -1,114 +1,44 @@
 package taskmanager.controllers;
 
-import taskmanager.entities.*;
-import taskmanager.repositories.*;
-import taskmanager.services.*;
+import taskmanager.entities.Task;
+import taskmanager.repositories.TaskRepository;
+import taskmanager.repositories.TaskRepositoryImpl;
+import taskmanager.services.TaskService;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        UserService userService = new UserService(new UserRepositoryImpl());
-        ProjectService projectService = new ProjectService(new ProjectRepositoryImpl());
-        TaskService taskService = new TaskService(new TaskRepositoryImpl());
-        CommentService commentService = new CommentService(new CommentRepositoryImpl());
+        // 1. Initialize Repository and Service
+        TaskRepository repository = new TaskRepositoryImpl();
+        TaskService taskService = new TaskService(repository);
 
-        Scanner sc = new Scanner(System.in);
+        System.out.println("--- Starting Milestone 2 Demo ---");
 
-        try {
-            System.out.println(" Starting Interactive Input ");
-            String name;
-            do {
-                System.out.print("Enter user name: ");
-                name = sc.nextLine().trim();
-            } while (name.isEmpty());
+        // 2. DEMO: BUILDER PATTERN
+        // We create a task without a long, confusing constructor.
+        Task newTask = new Task.TaskBuilder("Study for Java Defense")
+                .setStatus("Pending")
+                .setDeadline(LocalDate.now().plusDays(5))
+                .setProjectId(1)
+                .setAssignedUserId(10)
+                .build();
 
-            String email;
-            do {
-                System.out.print("Enter user email: ");
-                email = sc.nextLine().trim();
-            } while (email.isEmpty());
+        System.out.println("Created Task via Builder: " + newTask.getTitle());
 
-            String role;
-            do {
-                System.out.print("Enter user role (e.g., student, developer): ");
-                role = sc.nextLine().trim();
-            } while (role.isEmpty());
+        // 3. DEMO: FACTORY PATTERN (Inside addNewTask)
+        // When we call this, it saves to DB AND triggers the Notification Factory.
+        taskService.addNewTask(newTask);
 
-            User user = new User(0, name, email, role);
-            userService.createUser(user);
-            List<User> users = userService.getAllUsers();
-            int userId = users.get(users.size() - 1).getId();
-            System.out.println(" User created with ID: " + userId);
+        // 4. DEMO: LAMBDAS & STREAMS
+        // We filter the list of all tasks to find only 'Pending' ones using a Lambda.
+        System.out.println("\n--- Filtering Tasks by Status (Lambda) ---");
+        List<Task> pendingTasks = taskService.getTasksByStatus("Pending");
 
+        pendingTasks.forEach(t ->
+                System.out.println("Pending Task found: " + t.getTitle())
+        );
 
-
-            String projectTitle;
-            do {
-                System.out.print("Enter project title: ");
-                projectTitle = sc.nextLine().trim();
-            } while (projectTitle.isEmpty());
-
-            String projectDesc;
-            do {
-                System.out.print("Enter project description: ");
-                projectDesc = sc.nextLine().trim();
-            } while (projectDesc.isEmpty());
-
-            Project project = new Project(0, projectTitle, projectDesc, userId);
-            projectService.createProject(project);
-            List<Project> projects = projectService.getAllProjects();
-            int projectId = projects.get(projects.size() - 1).getId();
-            System.out.println(" Project created with ID: " + projectId);
-
-
-
-            String taskTitle;
-            do {
-                System.out.print("Enter task title: ");
-                taskTitle = sc.nextLine().trim();
-            } while (taskTitle.isEmpty());
-
-            String taskStatus;
-            do {
-                System.out.print("Enter task status (e.g., Pending, Finished): ");
-                taskStatus = sc.nextLine().trim();
-            } while (taskStatus.isEmpty());
-
-            LocalDate deadline = null;
-            while (deadline == null) {
-                System.out.print("Enter task deadline (YYYY-MM-DD): ");
-                String deadlineInput = sc.nextLine().trim();
-                try {
-                    deadline = LocalDate.parse(deadlineInput);
-                } catch (Exception e) {
-                    System.out.println(" Invalid date format. Try again.");
-                }
-            }
-
-            Task task = new Task(0, taskTitle, taskStatus, deadline, projectId, userId);
-            taskService.createTask(task);
-            System.out.println("Days remaining for this task: " + task.getDaysUntilDeadline());
-            List<Task> tasks = taskService.getAllTasks();
-            int taskId = tasks.get(tasks.size() - 1).getId();
-            System.out.println(" Task created with ID: " + taskId);
-
-
-
-            String commentText;
-            do {
-                System.out.print("Enter comment text: ");
-                commentText = sc.nextLine().trim();
-            } while (commentText.isEmpty());
-
-            Comment comment = new Comment(0, commentText, taskId, userId, LocalDateTime.now());
-            commentService.addComment(comment);
-            System.out.println(" Comment added successfully");
-
-        } catch (Exception e) {
-            System.err.println(" Error: " + e.getMessage());
-        }
+        System.out.println("\n--- Milestone 2 Demo Completed Successfully ---");
     }
 }
