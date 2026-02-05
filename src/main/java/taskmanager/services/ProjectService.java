@@ -1,11 +1,12 @@
-
 package taskmanager.services;
 
 import taskmanager.entities.Project;
 import taskmanager.repositories.ProjectRepository;
+
 import java.util.List;
 
 public class ProjectService {
+
     private final ProjectRepository projectRepo;
 
     public ProjectService(ProjectRepository projectRepo) {
@@ -16,14 +17,18 @@ public class ProjectService {
         if (project.getTitle() == null || project.getTitle().isEmpty()) {
             throw new RuntimeException("Project title cannot be empty!");
         }
-        projectRepo.createProject(project);
+        projectRepo.save(project);   // ✅ updated
     }
 
     public Project getProjectById(int id) {
-        return projectRepo.findProjectById(id);
+        return projectRepo.findById(id);   // ✅ updated
     }
 
     public List<Project> getAllProjects() {
-        return projectRepo.listAllProjects();
+        return projectRepo.findAll();      // ✅ updated
+    }
+
+    public void deleteProject(int id) {
+        projectRepo.delete(id);            // ✅ optional but consistent
     }
 }
