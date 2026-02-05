@@ -73,7 +73,7 @@ public class UserRepositoryImpl implements UserRepository {
         }
         return users;
     }
-
+//
     @Override
     public void delete(int id) {
         String sql = "DELETE FROM users WHERE id = ?";
