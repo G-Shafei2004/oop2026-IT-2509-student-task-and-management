@@ -2,6 +2,7 @@ package taskmanager.repositories;
 
 import taskmanager.db.DatabaseConnection;
 import taskmanager.entities.User;
+
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,30 +10,40 @@ import java.util.List;
 public class UserRepositoryImpl implements UserRepository {
 
     @Override
-    public int createUser(User user) {
+    public void save(User user) {
         String sql = "INSERT INTO users (name, email, role) VALUES (?, ?, ?)";
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getEmail());
             stmt.setString(3, user.getRole());
             stmt.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return 0;
     }
 
     @Override
-    public User findUserById(int id) {
+    public User findById(int id) {
         String sql = "SELECT * FROM users WHERE id = ?";
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setInt(1, id);
-            ResultSet rs = stmt.executeQuery();
-            if (rs.next()) {
-                return new User(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("role"));
+
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    return new User(
+                            rs.getInt("id"),
+                            rs.getString("name"),
+                            rs.getString("email"),
+                            rs.getString("role")
+                    );
+                }
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -40,17 +51,40 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
-    public List<User> listAllUsers() {
+    public List<User> findAll() {
         List<User> users = new ArrayList<>();
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        try (PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users");
+        String sql = "SELECT * FROM users";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
-                users.add(new User(rs.getInt("id"), rs.getString("name"), rs.getString("email"), rs.getString("role")));
+                users.add(new User(
+                        rs.getInt("id"),
+                        rs.getString("name"),
+                        rs.getString("email"),
+                        rs.getString("role")
+                ));
             }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return users;
+    }
+
+    @Override
+    public void delete(int id) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, id);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }
